@@ -3,7 +3,6 @@ Package.describe({
 });
 
 Package.on_use(function (api) {
-  api.use('underscore');
   api.use('coffeescript');
   api.add_files('minimongoid.coffee', 'server');
 });
