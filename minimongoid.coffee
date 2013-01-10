@@ -5,7 +5,6 @@ class Minimongoid
   constructor: (attributes = {}) ->
     @attributes = attributes
     @id = attributes._id
-    @demongoize() if @isPersisted()
 
   isPersisted: -> @id?
 
@@ -14,11 +13,11 @@ class Minimongoid
   save: ->
     return false unless @isValid()
 
-    @mongoize()
+    attributes = @constructor.mongoize(@attributes)
     if @isPersisted()
-      @constructor._collection.update @id, { $set: @attributes }
+      @constructor._collection.update @id, { $set: attributes }
     else
-      @id = @constructor._collection.insert @attributes
+      @id = @constructor._collection.insert attributes
 
     this
 
@@ -30,19 +29,15 @@ class Minimongoid
       @constructor._collection.remove @id
       @id = null
 
-  mongoize: -> @_omitPrivateAttributes()
-
-  demongoize: -> @_omitPrivateAttributes()
-
-  _omitPrivateAttributes: ->
-    attributes = {}
-    for name, value of @attributes
+  @mongoize: (attributes) ->
+    taken = {}
+    for name, value of attributes
       continue if name in ['_id', '_type']
-      attributes[name] = value
+      taken[name] = value
     
-    @attributes = attributes
-    
-    this
+    taken
+
+  @demongoize: @mongoize
 
   @_collection: null
 
@@ -63,7 +58,7 @@ class Minimongoid
 
   @toArray: (selector = {}, options = {}) ->
     for attributes in @where(selector, options).fetch()
-      @new(attributes)
+      @new(@demongoize(attributes))
 
   @count: (selector = {}, options = {}) ->
     @where(selector, options).count()
