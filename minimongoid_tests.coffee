@@ -16,16 +16,16 @@ Tinytest.add 'minimongoid - instance methods', (test) ->
 
 
   user.save()
-  id = user.id
   test.isTrue user.isPersisted()
-  test.equal User._collection.findOne(id), user.attributes
+  test.equal User.toArray()[0].attributes, name: 'John'
 
-
+  id = user.id
   user.update
     name: 'Jane'
     _id: 'some id'
   test.isTrue user.isPersisted()
-  test.equal User._collection.findOne(id), name: 'Jane', _id: id
+  test.equal User.toArray()[0].attributes, name: 'Jane'
+  test.equal user.id, id
 
 
   user.attributes =
@@ -34,28 +34,27 @@ Tinytest.add 'minimongoid - instance methods', (test) ->
 
 
   user.destroy()
-  test.isUndefined user.id
+  test.isNull user.id
 
 
 Tinytest.add 'minimongoid - class methods', (test) ->
   test.instanceOf User.new(name: 'Jane'), User
-  test.isFalse User.new(name: 'Jane').isPersisted()
+  test.isFalse User.new(name: 'John').isPersisted()
 
 
   test.instanceOf User.create(name: 'Jane'), User
-  test.isTrue User.create(name: 'Jane').isPersisted()
+  test.isTrue User.create(name: 'John').isPersisted()
 
 
   test.equal User._collection.find().fetch(), User.where().fetch()
   test.equal User._collection.find().fetch(), User.all().fetch()
 
 
-  test.equal (new User(object) for object in User._collection.find().fetch()), User.toArray()
+  test.equal (user.attributes for user in User.toArray()), [{ name: 'Jane' }, { name: 'John' }]
 
 
   test.equal 'number', typeof User.count()
 
 
   User.destroyAll()
-  test.equal 0, User.count()
-
+  test.equal User.count(), 0 

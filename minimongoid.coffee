@@ -1,24 +1,24 @@
 class Minimongoid
-  id: undefined
+  id: null
   attributes: {}
 
   constructor: (attributes = {}) ->
     @attributes = attributes
     @id = attributes._id
+    @demongoize() if @isPersisted()
 
-  isPersisted: -> not _.isUndefined(@id)
+  isPersisted: -> @id?
 
   isValid: -> true
 
   save: ->
     return false unless @isValid()
 
-    attributes = _.omit(@attributes, '_id', '_type')
-
+    @mongoize()
     if @isPersisted()
-      @_collection().update @id, { $set: attributes }
+      @constructor._collection.update @id, { $set: @attributes }
     else
-      @id = @attributes._id = @_collection().insert attributes
+      @id = @constructor._collection.insert @attributes
 
     this
 
@@ -27,11 +27,22 @@ class Minimongoid
 
   destroy: ->
     if @isPersisted()
-      @_collection().remove @id
-      @id = @attributes._id = undefined
+      @constructor._collection.remove @id
+      @id = null
 
-  _collection: ->
-    @constructor._collection
+  mongoize: -> @_omitPrivateAttributes()
+
+  demongoize: -> @_omitPrivateAttributes()
+
+  _omitPrivateAttributes: ->
+    attributes = {}
+    for name, value of @attributes
+      continue if name in ['_id', '_type']
+      attributes[name] = value
+    
+    @attributes = attributes
+    
+    this
 
   @_collection: null
 
@@ -51,12 +62,11 @@ class Minimongoid
     @_collection.find(selector, options)
 
   @toArray: (selector = {}, options = {}) ->
-    for object in @where(selector, options).fetch()
-      @new(object)
+    for attributes in @where(selector, options).fetch()
+      @new(attributes)
 
   @count: (selector = {}, options = {}) ->
     @where(selector, options).count()
 
   @destroyAll: (selector = {}) ->
     @_collection.remove(selector)
-
