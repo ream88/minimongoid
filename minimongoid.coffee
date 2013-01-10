@@ -30,12 +30,10 @@ class Minimongoid
       @id = null
 
   @mongoize: (attributes) ->
-    taken = {}
     for name, value of attributes
-      continue if name in ['_id', '_type']
-      taken[name] = value
+      delete attributes[name] if name in ['_id', '_type']
     
-    taken
+    attributes
 
   @demongoize: @mongoize
 
