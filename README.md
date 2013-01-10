@@ -1,10 +1,10 @@
 #minimongoid
 
-Mongoid inspired models. For your Meteor app. Kinda. Be sure to checkout the [post on coderwall.com](https://coderwall.com/p/_q9b1w).
+Mongoid inspired models. For your Meteor app. Kinda. Be sure to check out the [post](https://coderwall.com/p/_q9b1w) on my coderwall.
 
 ## Installation
 
-For now, download [minimongoid.coffee](minimongoid.coffee) and place it into your Meteor app. Dont forget to install the `coffeescript` package:
+For now, download [minimongoid.coffee](https://github.com/haihappen/minimongoid/blob/master/minimongoid.coffee) and place it into your Meteor app. Dont forget to install the `coffeescript` package:
 
 ```sh
 meteor add coffeescript
@@ -20,6 +20,7 @@ class User extends Minimongoid
 
 # Haters gonna hate!
 User.new(name: 'Bob').save()
+
 User.create name: 'Bob' # => User
 User.create name: '' # => false
 
@@ -28,7 +29,7 @@ User.where(name: 'Bob').toArray() # => [User]
 User.count() # => 1
 ```
 
-Be sure to checkout the [implementation](minimongoid.coffee) for the full API.
+Be sure to checkout the [implementation](https://github.com/haihappen/minimongoid/blob/master/minimongoid.coffee) for the full API.
 
 ## Testing
 
