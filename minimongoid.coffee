@@ -29,12 +29,14 @@ class Minimongoid
       @constructor._collection.remove @id
       @id = null
 
+  # Dont allow direct access to _id and _type.
   @mongoize: (attributes) ->
     for name, value of attributes
       delete attributes[name] if name in ['_id', '_type']
     
     attributes
 
+  # Demongoize is just an alias for mongoize.
   @demongoize: @mongoize
 
   @_collection: null
