@@ -17,6 +17,7 @@ class Minimongoid
     return false unless @isValid()
     
     attributes = @mongoize(@attributes)
+    attributes['_type'] = @constructor._type if @constructor._type?
     
     if @isPersisted()
       @constructor._collection.update @id, { $set: attributes }
@@ -48,6 +49,7 @@ class Minimongoid
     taken
 
   @_collection: undefined
+  @_type: undefined
 
   # Rubists will love me, everyone else will burn me!
   #
@@ -66,7 +68,7 @@ class Minimongoid
 
   @toArray: (selector = {}, options = {}) ->
     for attributes in @where(selector, options).fetch()
-      @new(@demongoize(attributes))
+      new(root[attributes._type] ? @)(attributes)
 
   @count: (selector = {}, options = {}) ->
     @where(selector, options).count()

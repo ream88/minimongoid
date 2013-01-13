@@ -57,4 +57,16 @@ Tinytest.add 'minimongoid - class methods', (test) ->
 
 
   User.destroyAll()
-  test.equal User.count(), 0 
+  test.equal User.count(), 0
+
+
+class SuperUser extends User
+  @_type: 'SuperUser'
+
+
+Tinytest.add 'minimongoid - single table inheritance', (test) ->
+  SuperUser.create name: 'John'
+  test.instanceOf User.toArray()[0], SuperUser
+
+
+  User.destroyAll()
