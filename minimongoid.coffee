@@ -3,8 +3,11 @@ class Minimongoid
   attributes: {}
 
   constructor: (attributes = {}) ->
-    @attributes = attributes
-    @id = attributes._id
+    if attributes._id
+      @attributes = @demongoize(attributes)
+      @id = attributes._id
+    else
+      @attributes = attributes
 
   isPersisted: -> @id?
 
@@ -12,13 +15,14 @@ class Minimongoid
 
   save: ->
     return false unless @isValid()
-
-    attributes = @constructor.mongoize(@attributes)
+    
+    attributes = @mongoize(@attributes)
+    
     if @isPersisted()
       @constructor._collection.update @id, { $set: attributes }
     else
       @id = @constructor._collection.insert attributes
-
+    
     this
 
   update: (@attributes) ->
@@ -29,15 +33,19 @@ class Minimongoid
       @constructor._collection.remove @id
       @id = null
 
-  # Dont allow direct access to _id and _type.
-  @mongoize: (attributes) ->
+  mongoize: (attributes) ->
+    taken = {}
     for name, value of attributes
-      delete attributes[name] if name in ['_id', '_type']
-    
-    attributes
+      continue if name.match(/^_/)
+      taken[name] = value
+    taken
 
-  # Demongoize is just an alias for mongoize.
-  @demongoize: @mongoize
+  demongoize: (attributes) ->
+    taken = {}
+    for name, value of attributes
+      continue if name.match(/^_/)
+      taken[name] = value
+    taken
 
   @_collection: undefined
 
