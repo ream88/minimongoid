@@ -1,5 +1,5 @@
 class Minimongoid
-  id: null
+  id: undefined
   attributes: {}
 
   constructor: (attributes = {}) ->
@@ -39,7 +39,7 @@ class Minimongoid
   # Demongoize is just an alias for mongoize.
   @demongoize: @mongoize
 
-  @_collection: null
+  @_collection: undefined
 
   # Rubists will love me, everyone else will burn me!
   #
