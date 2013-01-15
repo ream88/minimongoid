@@ -68,7 +68,8 @@ class Minimongoid
 
   @toArray: (selector = {}, options = {}) ->
     for attributes in @where(selector, options).fetch()
-      new(root[attributes._type] ? @)(attributes)
+      # eval is ok, because _type is never entered by user
+      new(eval(attributes._type) ? @)(attributes)
 
   @count: (selector = {}, options = {}) ->
     @where(selector, options).count()
