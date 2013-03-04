@@ -1,3 +1,16 @@
+Array.prototype.all = (test, context) ->
+  satisfied = true
+  for element in this
+    satisfied = false unless test.call(context, element)
+
+  satisfied
+
+Object.prototype.extend = (obj) ->
+  for own key, val of obj
+    this.key = val
+
+  this
+
 class Minimongoid
   id: undefined
   attributes: {}
@@ -55,16 +68,24 @@ class Minimongoid
   #
   # Allows calls like User.new firstname: 'John'
   @new: (attributes) ->
-    new @(attributes)
+    new @(attributes).extend(attributes)
 
   @create: (attributes) ->
     @new(attributes).save()
 
   @where: (selector = {}, options = {}) ->
-    @_collection.find(selector, options)
+    @_collection.find(selector, options).map (record) =>
+      model = new @(record)
+      model.extend(model.attributes)
 
   @all: (selector = {}, options = {}) ->
-    @_collection.find(selector, options)
+    @where(selector, options)
+
+  @find: (selector = {}, options = {}) ->
+    document = @_collection.findOne(selector, options)
+    if document
+      model = new @(document)
+      model.extend(model.attributes)
 
   @toArray: (selector = {}, options = {}) ->
     for attributes in @where(selector, options).fetch()
