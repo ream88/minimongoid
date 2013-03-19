@@ -10,6 +10,10 @@ For now, download [minimongoid.coffee](https://github.com/haihappen/minimongoid/
 meteor add coffeescript
 ```
 
+### Wanna have a pure JavaScript version?
+
+Paste the content of [minimongoid.coffee](https://raw.github.com/haihappen/minimongoid/master/minimongoid.coffee) into [here](http://coffeescript.org/#try:%23%20Paste%20minimongoid.coffee%20into%20here!)!
+
 ## Usage
 
 ```coffeescript
