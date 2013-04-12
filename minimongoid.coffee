@@ -1,3 +1,16 @@
+Array.prototype.all = (test, context) ->
+  satisfied = true
+  for element in this
+    satisfied = false unless test.call(context, element)
+
+  satisfied
+
+Object.prototype.extend = (obj) ->
+  for own key, val of obj
+    this[key] = val
+
+  this
+
 class Minimongoid
   id: undefined
   attributes: {}
@@ -24,7 +37,7 @@ class Minimongoid
     else
       @id = @constructor._collection.insert attributes
     
-    this
+    this.extend attributes
 
   update: (@attributes) ->
     @save()
@@ -55,24 +68,26 @@ class Minimongoid
   #
   # Allows calls like User.new firstname: 'John'
   @new: (attributes) ->
-    new @(attributes)
+    model = new @(attributes)
+    model.extend(attributes)
 
   @create: (attributes) ->
-    @new(attributes).save()
+    model = @new(attributes).save()
 
   @where: (selector = {}, options = {}) ->
-    @_collection.find(selector, options)
+    @_collection.find(selector, options).map (record) =>
+      @new record
 
   @all: (selector = {}, options = {}) ->
-    @_collection.find(selector, options)
+    @where(selector, options)
 
-  @toArray: (selector = {}, options = {}) ->
-    for attributes in @where(selector, options).fetch()
-      # eval is ok, because _type is never entered by user
-      new(eval(attributes._type) ? @)(attributes)
+  @find: (selector = {}, options = {}) ->
+    document = @_collection.findOne(selector, options)
+    if document
+      new @(document)
 
   @count: (selector = {}, options = {}) ->
-    @where(selector, options).count()
+    @where(selector, options).length
 
   @destroyAll: (selector = {}) ->
     @_collection.remove(selector)
